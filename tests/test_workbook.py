@@ -1,0 +1,128 @@
+import tempfile
+import unittest
+from pathlib import Path
+
+from openpyxl import load_workbook
+from openpyxl.utils import get_column_letter
+
+from integration_matrix.components import Component
+from integration_matrix.workbook import (
+    DIRECTION_OPTIONS,
+    INTERFACE_OPTIONS,
+    create_workbook,
+    save_workbook,
+)
+
+
+class WorkbookGenerationTest(unittest.TestCase):
+    def test_generates_expected_three_component_workbook(self):
+        components = [
+            Component("FLM", "T4.1", "UniMaaS EDC Connector"),
+            Component("FLM", "T4.1", "Digital Thread Component"),
+            Component("FLM", "T4.1", "Knowledge Graph"),
+        ]
+
+        workbook = create_workbook(components)
+
+        self.assertEqual(workbook.sheetnames, ["Integration Matrix", "Descriptions"])
+
+        matrix = workbook["Integration Matrix"]
+        descriptions = workbook["Descriptions"]
+        self.assertEqual(matrix.max_row, 5)
+        self.assertEqual(matrix.max_column, 9)
+        self.assertEqual(descriptions.max_row, 4)
+        self.assertEqual(descriptions.max_column, 5)
+
+        self.assertEqual(matrix.freeze_panes, "D3")
+        self.assertEqual(descriptions.freeze_panes, "A2")
+        self.assertIn("D1:E1", {str(range_) for range_ in matrix.merged_cells.ranges})
+        self.assertIn("F1:G1", {str(range_) for range_ in matrix.merged_cells.ranges})
+        self.assertIn("H1:I1", {str(range_) for range_ in matrix.merged_cells.ranges})
+
+        self.assertEqual(matrix["F3"].value, '=IF(D4="↗","↙",IF(D4="↙","↗",D4))')
+        self.assertEqual(matrix["G3"].value, "=E4")
+        self.assertEqual(matrix["H3"].value, '=IF(D5="↗","↙",IF(D5="↙","↗",D5))')
+        self.assertEqual(matrix["I3"].value, "=E5")
+        self.assertEqual(matrix["H4"].value, '=IF(F5="↗","↙",IF(F5="↙","↗",F5))')
+        self.assertEqual(matrix["I4"].value, "=G5")
+
+        self.assertTrue(_is_black(matrix["D3"]))
+        self.assertTrue(_is_black(matrix["F4"]))
+        self.assertTrue(_is_black(matrix["H5"]))
+
+        direction_validation, interface_validation = _validations(matrix)
+        self.assertEqual(direction_validation.formula1, f'"{",".join(DIRECTION_OPTIONS)}"')
+        self.assertEqual(interface_validation.formula1, f'"{",".join(INTERFACE_OPTIONS)}"')
+        self.assertTrue(_contains_validation(direction_validation, "D4"))
+        self.assertTrue(_contains_validation(interface_validation, "E4"))
+
+    def test_saves_reopenable_workbook(self):
+        components = [Component("NET", "T8.1", "Core Integration Platform")]
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "matrix.xlsx"
+            save_workbook(create_workbook(components), path)
+            reopened = load_workbook(path, data_only=False)
+
+        self.assertEqual(reopened.sheetnames, ["Integration Matrix", "Descriptions"])
+        self.assertEqual(reopened["Integration Matrix"]["C3"].value, "Core Integration Platform")
+
+    def test_reference_component_count_shape(self):
+        components = [
+            Component("FLM", "T4.1", "UniMaaS EDC Connector"),
+            Component("FLM", "T4.1", "Digital Thread Component"),
+            Component("FLM", "T4.1", "Knowledge Graph"),
+            Component("NTUA", "T4.2", "Resource Monitoring Engine"),
+            Component("ODINS", "T4.3", "IAM & Data Governance"),
+            Component("ODINS", "T4.4", "DPP Infrastructure"),
+            Component("QUB", "T5.1", "Formal Modelling Engine"),
+            Component("QUB", "T5.1", "Use Case Model"),
+            Component("ETS", "T5.2", "AI Demand & Asset Predictor"),
+            Component("ETS", "T5.3", "Intent-Based Servitisation/Chatbot"),
+            Component("UCLouvain", "T5.4", "Zero-X Evaluation Engine"),
+            Component("UCLouvain", "T6.1", "Resource Scheduling Controller"),
+            Component("NTUA", "T6.2", "AI-Assisted Digital Twin"),
+            Component("NTUA", "T6.3", "Cloud Mfg Orchestrator"),
+            Component("UPV", "T6.4", "Circularity Optimization Mechanism"),
+            Component("NET", "T8.1", "Core Integration Platform"),
+            Component("CEL", "T8.2", "Dashboard & Frontend"),
+            Component("CEL", "T8.2", "Registration Page for Providers/Clients"),
+            Component("CEL", "T8.2", "Search Engine for Customers"),
+            Component("CEL", "T8.2", "Provider's UI"),
+            Component("CEL", "T8.2", "Chatbot Interaction"),
+            Component("CEL", "T8.2", "Real-time UI (ArgoCD)"),
+            Component("CEL", "T8.2", "Connection with T4.2 (infra real-time)"),
+            Component("CEL", "T8.2", "Connection with DPP interface"),
+            Component("AEGEAN", "T9.2", "AEGEAN_ERP"),
+            Component("ADIENT", "T9.3", "ADIENT_ERP"),
+            Component("ANV", "T9.4", "ANV_ERP"),
+            Component("CATONE", "T9.5", "CATONE_ERP"),
+        ]
+
+        matrix = create_workbook(components)["Integration Matrix"]
+
+        self.assertEqual(matrix.max_row, 30)
+        self.assertEqual(matrix.max_column, 59)
+        self.assertEqual(get_column_letter(matrix.max_column), "BG")
+        self.assertEqual(matrix["F3"].value, '=IF(D4="↗","↙",IF(D4="↙","↗",D4))')
+        self.assertEqual(matrix["BG1"].value, None)
+        self.assertEqual(matrix["BF1"].value, "CATONE_ERP")
+        self.assertTrue(_is_black(matrix["BG30"]))
+
+
+def _validations(sheet):
+    validations = list(sheet.data_validations.dataValidation)
+    assert len(validations) == 2
+    return validations[0], validations[1]
+
+
+def _contains_validation(validation, coordinate):
+    return any(coordinate in cell_range for cell_range in validation.cells.ranges)
+
+
+def _is_black(cell):
+    color = cell.fill.fgColor.rgb
+    return color is not None and color.endswith("000000")
+
+
+if __name__ == "__main__":
+    unittest.main()
