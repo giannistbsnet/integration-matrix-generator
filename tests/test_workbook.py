@@ -17,9 +17,9 @@ from integration_matrix.workbook import (
 class WorkbookGenerationTest(unittest.TestCase):
     def test_generates_expected_three_component_workbook(self):
         components = [
-            Component("FLM", "T4.1", "UniMaaS EDC Connector"),
-            Component("FLM", "T4.1", "Digital Thread Component"),
-            Component("FLM", "T4.1", "Knowledge Graph"),
+            Component("ACME", "T1.1", "Order Service"),
+            Component("ACME", "T1.2", "Inventory Service"),
+            Component("NOVA", "T2.1", "Analytics Engine"),
         ]
 
         workbook = create_workbook(components)
@@ -57,45 +57,19 @@ class WorkbookGenerationTest(unittest.TestCase):
         self.assertTrue(_contains_validation(interface_validation, "E4"))
 
     def test_saves_reopenable_workbook(self):
-        components = [Component("NET", "T8.1", "Core Integration Platform")]
+        components = [Component("ACME", "T1.1", "Order Service")]
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "matrix.xlsx"
             save_workbook(create_workbook(components), path)
             reopened = load_workbook(path, data_only=False)
 
         self.assertEqual(reopened.sheetnames, ["Integration Matrix", "Descriptions"])
-        self.assertEqual(reopened["Integration Matrix"]["C3"].value, "Core Integration Platform")
+        self.assertEqual(reopened["Integration Matrix"]["C3"].value, "Order Service")
 
     def test_reference_component_count_shape(self):
         components = [
-            Component("FLM", "T4.1", "UniMaaS EDC Connector"),
-            Component("FLM", "T4.1", "Digital Thread Component"),
-            Component("FLM", "T4.1", "Knowledge Graph"),
-            Component("NTUA", "T4.2", "Resource Monitoring Engine"),
-            Component("ODINS", "T4.3", "IAM & Data Governance"),
-            Component("ODINS", "T4.4", "DPP Infrastructure"),
-            Component("QUB", "T5.1", "Formal Modelling Engine"),
-            Component("QUB", "T5.1", "Use Case Model"),
-            Component("ETS", "T5.2", "AI Demand & Asset Predictor"),
-            Component("ETS", "T5.3", "Intent-Based Servitisation/Chatbot"),
-            Component("UCLouvain", "T5.4", "Zero-X Evaluation Engine"),
-            Component("UCLouvain", "T6.1", "Resource Scheduling Controller"),
-            Component("NTUA", "T6.2", "AI-Assisted Digital Twin"),
-            Component("NTUA", "T6.3", "Cloud Mfg Orchestrator"),
-            Component("UPV", "T6.4", "Circularity Optimization Mechanism"),
-            Component("NET", "T8.1", "Core Integration Platform"),
-            Component("CEL", "T8.2", "Dashboard & Frontend"),
-            Component("CEL", "T8.2", "Registration Page for Providers/Clients"),
-            Component("CEL", "T8.2", "Search Engine for Customers"),
-            Component("CEL", "T8.2", "Provider's UI"),
-            Component("CEL", "T8.2", "Chatbot Interaction"),
-            Component("CEL", "T8.2", "Real-time UI (ArgoCD)"),
-            Component("CEL", "T8.2", "Connection with T4.2 (infra real-time)"),
-            Component("CEL", "T8.2", "Connection with DPP interface"),
-            Component("AEGEAN", "T9.2", "AEGEAN_ERP"),
-            Component("ADIENT", "T9.3", "ADIENT_ERP"),
-            Component("ANV", "T9.4", "ANV_ERP"),
-            Component("CATONE", "T9.5", "CATONE_ERP"),
+            Component(f"ORG{index:02d}", f"T{index:02d}", f"Component {index:02d}")
+            for index in range(1, 29)
         ]
 
         matrix = create_workbook(components)["Integration Matrix"]
@@ -105,7 +79,7 @@ class WorkbookGenerationTest(unittest.TestCase):
         self.assertEqual(get_column_letter(matrix.max_column), "BG")
         self.assertEqual(matrix["F3"].value, '=IF(D4="↗","↙",IF(D4="↙","↗",D4))')
         self.assertEqual(matrix["BG1"].value, None)
-        self.assertEqual(matrix["BF1"].value, "CATONE_ERP")
+        self.assertEqual(matrix["BF1"].value, "Component 28")
         self.assertTrue(_is_black(matrix["BG30"]))
 
 

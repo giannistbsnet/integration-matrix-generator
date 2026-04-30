@@ -1,5 +1,5 @@
 partner,task,component
-FLM,T4.1,UniMaaS EDC Connector
-FLM,T4.1,Digital Thread Component
-FLM,T4.1,Knowledge Graph
-NTUA,T4.2,Resource Monitoring Engine
+ACME,T1.1,Order Service
+ACME,T1.2,Inventory Service
+NOVA,T2.1,Analytics Engine
+NOVA,T2.2,Customer Portal

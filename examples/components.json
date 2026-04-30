@@ -1,22 +1,22 @@
 [
   {
-    "partner": "FLM",
-    "task": "T4.1",
-    "component": "UniMaaS EDC Connector"
+    "partner": "ACME",
+    "task": "T1.1",
+    "component": "Order Service"
   },
   {
-    "partner": "FLM",
-    "task": "T4.1",
-    "component": "Digital Thread Component"
+    "partner": "ACME",
+    "task": "T1.2",
+    "component": "Inventory Service"
   },
   {
-    "partner": "FLM",
-    "task": "T4.1",
-    "component": "Knowledge Graph"
+    "partner": "NOVA",
+    "task": "T2.1",
+    "component": "Analytics Engine"
   },
   {
-    "partner": "NTUA",
-    "task": "T4.2",
-    "component": "Resource Monitoring Engine"
+    "partner": "NOVA",
+    "task": "T2.2",
+    "component": "Customer Portal"
   }
 ]

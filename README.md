@@ -9,20 +9,31 @@ The workbook contains:
 
 ## Install
 
+Recommended for day-to-day use:
+
 ```bash
-python -m pip install -e .
+./scripts/generate-workbook --input examples/components.csv --output IntegrationMatrix.generated.xlsx
 ```
 
-## Usage
+The script creates a local `.venv` in this project and installs pinned dependencies there. That keeps the tool isolated from your global Python packages and avoids PATH issues with user-level pip installs.
+
+If you prefer a normal editable Python install:
+
+```bash
+python3 -m pip install -e .
+generate-integration-matrix --input examples/components.csv --output IntegrationMatrix.generated.xlsx
+```
+
+The legacy command also works after installation:
 
 ```bash
 integration-matrix generate --input examples/components.csv --output IntegrationMatrix.generated.xlsx
 ```
 
-You can also run the package without installing the console script:
+You can also run the package without installing the console script if dependencies are already available:
 
 ```bash
-PYTHONPATH=src python -m integration_matrix generate --input examples/components.csv --output IntegrationMatrix.generated.xlsx
+PYTHONPATH=src python3 -m integration_matrix generate --input examples/components.csv --output IntegrationMatrix.generated.xlsx
 ```
 
 ## Input Format
@@ -31,16 +42,16 @@ CSV input:
 
 ```csv
 partner,task,component
-FLM,T4.1,UniMaaS EDC Connector
-FLM,T4.1,Digital Thread Component
+ACME,T1.1,Order Service
+ACME,T1.2,Inventory Service
 ```
 
 JSON input:
 
 ```json
 [
-  {"partner": "FLM", "task": "T4.1", "component": "UniMaaS EDC Connector"},
-  {"partner": "FLM", "task": "T4.1", "component": "Digital Thread Component"}
+  {"partner": "ACME", "task": "T1.1", "component": "Order Service"},
+  {"partner": "ACME", "task": "T1.2", "component": "Inventory Service"}
 ]
 ```
 
@@ -71,5 +82,5 @@ Eclipse Dataspace Connector (EDC), AAS / Eclipse BaSyx, File / Batch, Other
 ## Tests
 
 ```bash
-PYTHONPATH=src python -m unittest discover -s tests
+PYTHONPATH=src python3 -m unittest discover -s tests
 ```
