@@ -91,7 +91,7 @@ function buildDescriptionsSheet(sheet: ExcelJS.Worksheet, components: Component[
       { name: 'Description of Component', filterButton: true },
       { name: 'Description of Interface', filterButton: true },
     ],
-    rows: components.map(c => [c.partner, c.task, c.component, null, null]),
+    rows: components.map(c => [c.partner, c.task, c.component, '', '']),
   });
 
   sheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 1 }];
@@ -122,15 +122,10 @@ function buildDescriptionsSheet(sheet: ExcelJS.Worksheet, components: Component[
     }
   }
 
-  sheet.getCell('E1').note = {
-    texts: [{
-      text: (
-        '1. What protocol/technology do you expose?\n\n' +
-        '2. What data do you send/receive and in what format?\n\n' +
-        '3. What does a consumer need to connect to you?'
-      ),
-    }],
-  } as ExcelJS.Comment;
+  sheet.getCell('E1').note =
+    '1. What protocol/technology do you expose?\n\n' +
+    '2. What data do you send/receive and in what format?\n\n' +
+    '3. What does a consumer need to connect to you?';
 }
 
 // ─── Matrix sheet ─────────────────────────────────────────────────────────────
