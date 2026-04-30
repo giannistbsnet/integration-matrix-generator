@@ -43,13 +43,6 @@ npm run build
 # Output: web/dist/
 ```
 
-### GitHub Pages deployment
-
-Push to `main` — the included GitHub Actions workflow (`.github/workflows/deploy.yml`) builds the app and deploys `web/dist/` to GitHub Pages automatically.
-
-Before the first deploy, enable GitHub Pages in your repo settings:
-**Settings → Pages → Source → GitHub Actions**.
-
 ---
 
 ## Python CLI
