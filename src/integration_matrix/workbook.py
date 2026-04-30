@@ -210,8 +210,11 @@ def _write_matrix_cells(sheet, count: int) -> None:
                 mirror_interface_col = mirror_direction_col + 1
                 direction_ref = f"{get_column_letter(mirror_direction_col)}{mirror_row}"
                 interface_ref = f"{get_column_letter(mirror_interface_col)}{mirror_row}"
-                direction_cell.value = f'=IF({direction_ref}="↗","↙",IF({direction_ref}="↙","↗",{direction_ref}))'
-                interface_cell.value = f"={interface_ref}"
+                direction_cell.value = (
+                    f'=IF({direction_ref}="","",IF({direction_ref}="↗","↙",'
+                    f'IF({direction_ref}="↙","↗",{direction_ref})))'
+                )
+                interface_cell.value = f'=IF({interface_ref}="","",{interface_ref})'
                 _style_matrix_pair(direction_cell, interface_cell, fill=MIRROR_FILL)
             else:
                 _style_matrix_pair(direction_cell, interface_cell)
