@@ -12,11 +12,7 @@ NOVA,T2.2,Customer Portal
 NOVA,T2.3,Data Warehouse
 NOVA,T2.4,Notification Service
 ZEUS,T3.1,Workflow Orchestrator
-ZEUS,T3.2,Mobile App
-ZEUS,T3.3,Legacy ERP Connector
-NIMBUS,T4.1,API Gateway
-NIMBUS,T4.2,Partner Portal
-NIMBUS,T4.3,User Directory`.trim();
+ZEUS,T3.2,Mobile App`.trim();
 
 const EXAMPLE_JSON = JSON.stringify([
   { partner: 'ACME', task: 'T1.1', component: 'Order Service' },
@@ -25,39 +21,92 @@ const EXAMPLE_JSON = JSON.stringify([
   { partner: 'NOVA', task: 'T2.2', component: 'Customer Portal' },
 ], null, 2);
 
-const textarea = document.getElementById('input') as HTMLTextAreaElement;
-const generateBtn = document.getElementById('generate') as HTMLButtonElement;
-const loadExampleBtn = document.getElementById('load-example') as HTMLButtonElement;
-const fileInput = document.getElementById('file-input') as HTMLInputElement;
-const messageEl = document.getElementById('message') as HTMLDivElement;
-const showCsvBtn = document.getElementById('show-csv') as HTMLButtonElement;
-const showJsonBtn = document.getElementById('show-json') as HTMLButtonElement;
+const textarea    = document.getElementById('input')       as HTMLTextAreaElement;
+const generateBtn = document.getElementById('generate')    as HTMLButtonElement;
+const loadExample = document.getElementById('load-example') as HTMLButtonElement;
+const fileInput   = document.getElementById('file-input')  as HTMLInputElement;
+const showCsvBtn  = document.getElementById('show-csv')    as HTMLButtonElement;
+const showJsonBtn = document.getElementById('show-json')   as HTMLButtonElement;
+const lineNums    = document.getElementById('line-nums')   as HTMLDivElement;
+const inputStats  = document.getElementById('input-stats') as HTMLSpanElement;
+const statusBar   = document.getElementById('status-bar')  as HTMLDivElement;
+const outputSize  = document.getElementById('output-size') as HTMLSpanElement;
+const modKey      = document.getElementById('mod-key')     as HTMLElement;
+
+// Set platform modifier key label
+modKey.textContent = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl';
 
 let exampleFormat: 'csv' | 'json' = 'csv';
 
-function showMessage(text: string, type: 'error' | 'success'): void {
-  messageEl.textContent = text;
-  messageEl.className = `message ${type}`;
+// ─── Line numbers ─────────────────────────────────────────────────────────────
+
+function updateLineNums(): void {
+  const lines = textarea.value.split('\n').length;
+  lineNums.innerHTML = Array.from({ length: lines }, (_, i) => `<span>${i + 1}</span>`).join('');
 }
 
-function clearMessage(): void {
-  messageEl.textContent = '';
-  messageEl.className = 'message hidden';
+function syncScroll(): void {
+  lineNums.scrollTop = textarea.scrollTop;
 }
 
-function setExampleFormat(format: 'csv' | 'json'): void {
+textarea.addEventListener('input', () => { updateLineNums(); syncScroll(); onInput(); });
+textarea.addEventListener('scroll', syncScroll);
+
+// ─── Live validation ──────────────────────────────────────────────────────────
+
+function estimateSize(count: number): string {
+  // Rough heuristic: ~4 KB base + ~0.8 KB per component
+  const kb = Math.round(4 + count * 0.8);
+  return kb < 1024 ? `~${kb} KB` : `~${(kb / 1024).toFixed(1)} MB`;
+}
+
+function onInput(): void {
+  const text = textarea.value.trim();
+
+  if (!text) {
+    statusBar.innerHTML = '';
+    inputStats.textContent = '';
+    outputSize.textContent = '';
+    return;
+  }
+
+  try {
+    const components = parseComponents(textarea.value);
+    const partners = new Set(components.map(c => c.partner).filter(Boolean));
+    const partnerLabel = partners.size > 0
+      ? ` · ${partners.size} partner${partners.size !== 1 ? 's' : ''}`
+      : '';
+
+    inputStats.textContent = `${components.length} row${components.length !== 1 ? 's' : ''}${partnerLabel}`;
+    statusBar.innerHTML = `<span class="status-dot ok"></span><span class="status-text ok">Valid ${textarea.value.trimStart().startsWith('[') ? 'JSON' : 'CSV'}</span>`;
+    outputSize.textContent = `${components.length} × ${components.length} cells · ${estimateSize(components.length)}`;
+  } catch (err) {
+    inputStats.textContent = '';
+    outputSize.textContent = '';
+    statusBar.innerHTML = `<span class="status-dot err"></span><span class="status-text err">${(err as Error).message}</span>`;
+  }
+}
+
+// ─── Format toggle ────────────────────────────────────────────────────────────
+
+function setFormat(format: 'csv' | 'json'): void {
   exampleFormat = format;
-  showCsvBtn.classList.toggle('btn-active', format === 'csv');
-  showJsonBtn.classList.toggle('btn-active', format === 'json');
+  showCsvBtn.classList.toggle('active', format === 'csv');
+  showJsonBtn.classList.toggle('active', format === 'json');
 }
 
-loadExampleBtn.addEventListener('click', () => {
+showCsvBtn.addEventListener('click', () => setFormat('csv'));
+showJsonBtn.addEventListener('click', () => setFormat('json'));
+
+// ─── Load example ─────────────────────────────────────────────────────────────
+
+loadExample.addEventListener('click', () => {
   textarea.value = exampleFormat === 'csv' ? EXAMPLE_CSV : EXAMPLE_JSON;
-  clearMessage();
+  updateLineNums();
+  onInput();
 });
 
-showCsvBtn.addEventListener('click', () => setExampleFormat('csv'));
-showJsonBtn.addEventListener('click', () => setExampleFormat('json'));
+// ─── File upload ──────────────────────────────────────────────────────────────
 
 fileInput.addEventListener('change', () => {
   const file = fileInput.files?.[0];
@@ -65,23 +114,21 @@ fileInput.addEventListener('change', () => {
   const reader = new FileReader();
   reader.onload = (e) => {
     textarea.value = (e.target?.result as string) ?? '';
-    clearMessage();
+    updateLineNums();
+    onInput();
   };
   reader.readAsText(file, 'utf-8');
   fileInput.value = '';
 });
 
-textarea.addEventListener('input', clearMessage);
+// ─── Generate ─────────────────────────────────────────────────────────────────
 
-generateBtn.addEventListener('click', async () => {
-  clearMessage();
-  const text = textarea.value;
-
+async function generate(): Promise<void> {
   let components;
   try {
-    components = parseComponents(text);
+    components = parseComponents(textarea.value);
   } catch (err) {
-    showMessage((err as Error).message, 'error');
+    statusBar.innerHTML = `<span class="status-dot err"></span><span class="status-text err">${(err as Error).message}</span>`;
     return;
   }
 
@@ -96,19 +143,31 @@ generateBtn.addEventListener('click', async () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'IntegrationMatrix.xlsx';
+    a.download = 'integration-matrix.xlsx';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showMessage(`Generated matrix for ${components.length} component${components.length !== 1 ? 's' : ''}.`, 'success');
   } catch (err) {
-    showMessage('Failed to generate workbook: ' + (err as Error).message, 'error');
+    statusBar.innerHTML = `<span class="status-dot err"></span><span class="status-text err">Failed: ${(err as Error).message}</span>`;
   } finally {
     generateBtn.disabled = false;
-    generateBtn.textContent = 'Generate XLSX';
+    generateBtn.textContent = 'Generate XLSX →';
+  }
+}
+
+generateBtn.addEventListener('click', generate);
+
+// Cmd/Ctrl+Enter shortcut
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+    e.preventDefault();
+    generate();
   }
 });
 
-// Load example on startup
+// ─── Init ─────────────────────────────────────────────────────────────────────
+
 textarea.value = EXAMPLE_CSV;
+updateLineNums();
+onInput();

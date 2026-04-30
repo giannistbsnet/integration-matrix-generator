@@ -11,46 +11,97 @@
 <body>
   <div class="app">
     <header class="header">
-      <h1>Integration Matrix Generator</h1>
-      <p>Generate an Excel integration matrix from a CSV or JSON component list</p>
+      <h1>Generate an integration matrix</h1>
+      <p>Drop a CSV or JSON list of components &amp; get back an Excel matrix with mirrored direction &amp; interface columns.</p>
     </header>
 
-    <main class="main">
-      <div class="panel input-panel">
-        <div class="panel-header">
-          <h2>Components</h2>
-          <div class="panel-actions">
-            <div class="example-toggle">
-              <button id="show-csv" class="btn-outline btn-active btn-sm">CSV</button>
-              <button id="show-json" class="btn-outline btn-sm">JSON</button>
+    <div class="layout">
+      <!-- Left column -->
+      <div class="left-col">
+
+        <!-- Input card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <span class="card-label">Components</span>
+              <span class="input-stats" id="input-stats"></span>
             </div>
-            <button id="load-example" class="btn-outline btn-sm">Load example</button>
-            <label for="file-input" class="btn-outline btn-sm">Upload file</label>
-            <input type="file" id="file-input" accept=".csv,.json" />
+            <div class="card-header-right">
+              <div class="seg-ctrl">
+                <button id="show-csv" class="seg-btn active">CSV</button>
+                <button id="show-json" class="seg-btn">JSON</button>
+              </div>
+              <button id="load-example" class="btn-ghost">Load example</button>
+              <label for="file-input" class="btn-ghost">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M7.25 10.25a.75.75 0 0 0 1.5 0V4.56l1.72 1.72a.75.75 0 1 0 1.06-1.06L8.53 2.22a.75.75 0 0 0-1.06 0L4.47 5.22a.75.75 0 0 0 1.06 1.06l1.72-1.72v5.69Z"/><path d="M3.5 9.75a.75.75 0 0 0-1.5 0v1.5A2.75 2.75 0 0 0 4.75 14h6.5A2.75 2.75 0 0 0 14 11.25v-1.5a.75.75 0 0 0-1.5 0v1.5c0 .69-.56 1.25-1.25 1.25h-6.5c-.69 0-1.25-.56-1.25-1.25v-1.5Z"/></svg>
+                Upload
+              </label>
+              <input type="file" id="file-input" accept=".csv,.json" />
+            </div>
+          </div>
+
+          <div class="editor-wrap">
+            <div class="line-nums" id="line-nums" aria-hidden="true"></div>
+            <textarea
+              id="input"
+              spellcheck="false"
+              placeholder="partner,task,component&#10;ACME,T1.1,Order Service"
+            ></textarea>
+          </div>
+
+          <div class="card-footer">
+            <div class="status-bar" id="status-bar"></div>
+            <div class="kbd-hint"><kbd id="mod-key">⌘</kbd><kbd>Enter</kbd> to generate</div>
           </div>
         </div>
 
-        <textarea
-          id="input"
-          spellcheck="false"
-          placeholder="partner,task,component&#10;ACME,T1.1,Order Service"
-        ></textarea>
+        <!-- Output card -->
+        <div class="card output-card">
+          <span class="output-label">Output</span>
+          <div class="output-info">
+            <span class="output-filename">integration-matrix.xlsx</span>
+            <span class="output-size" id="output-size"></span>
+          </div>
+          <button id="generate" class="btn-generate">Generate XLSX →</button>
+        </div>
 
-        <div id="message" class="message hidden"></div>
+        <!-- Accordion -->
+        <details class="card accordion">
+          <summary>
+            <span class="accordion-icon">?</span>
+            How matrix mirroring works
+            <svg class="chevron" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z"/></svg>
+          </summary>
+          <div class="accordion-body">
+            <p>Fill the lower-left triangle only. The upper-right triangle mirrors automatically:</p>
+            <ul>
+              <li><strong>↗</strong> mirrors as <strong>↙</strong></li>
+              <li><strong>↙</strong> mirrors as <strong>↗</strong></li>
+              <li><strong>↔</strong> mirrors unchanged</li>
+              <li>Interface type copies the counterpart cell</li>
+            </ul>
+            <p>Direction options: <code>↔</code> <code>↗</code> <code>↙</code></p>
+          </div>
+        </details>
 
-        <button id="generate" class="btn-primary">Generate XLSX</button>
       </div>
 
-      <aside class="panel help-panel">
-        <h2>Format</h2>
+      <!-- Right column -->
+      <aside class="right-col">
+        <div class="card ref-card">
+          <div class="ref-header">
+            <h2>Format reference</h2>
+            <span class="ref-badge">schema</span>
+          </div>
 
-        <h3>CSV</h3>
-        <pre>partner,task,component
+          <h3 class="ref-section-label">CSV</h3>
+          <pre class="ref-pre">partner,task,component
 ACME,T1.1,Order Service
+ACME,T1.2,Inventory Service
 NOVA,T2.1,Analytics Engine</pre>
 
-        <h3>JSON</h3>
-        <pre>[
+          <h3 class="ref-section-label">JSON</h3>
+          <pre class="ref-pre">[
   {
     "partner": "ACME",
     "task": "T1.1",
@@ -58,42 +109,13 @@ NOVA,T2.1,Analytics Engine</pre>
   }
 ]</pre>
 
-        <p style="margin-top:10px">
-          <code>component</code> is required.<br/>
-          <code>partner</code> and <code>task</code> are optional.
-        </p>
-
-        <div class="help-divider"></div>
-
-        <h3>Matrix behavior</h3>
-        <p>Fill the lower triangle. The upper triangle mirrors automatically:</p>
-        <ul>
-          <li>↗ mirrors as ↙</li>
-          <li>↙ mirrors as ↗</li>
-          <li>↔ mirrors unchanged</li>
-          <li>Interface copies counterpart</li>
-        </ul>
-
-        <div class="help-divider"></div>
-
-        <h3>Direction options</h3>
-        <p>↔ &nbsp; ↗ &nbsp; ↙</p>
-
-        <h3>Interface options</h3>
-        <ul>
-          <li>REST API</li>
-          <li>GraphQL, gRPC</li>
-          <li>Kafka, MQTT</li>
-          <li>WebSocket</li>
-          <li>SPARQL endpoint</li>
-          <li>NGSI-LD</li>
-          <li>Eclipse Dataspace Connector (EDC)</li>
-          <li>AAS / Eclipse BaSyx</li>
-          <li>File / Batch</li>
-          <li>Other</li>
-        </ul>
+          <div class="schema-note">
+            <code>component</code> is required. <code>partner</code> and
+            <code>task</code> are optional.
+          </div>
+        </div>
       </aside>
-    </main>
+    </div>
   </div>
 
   <script type="module" src="/src/main.ts"></script>
