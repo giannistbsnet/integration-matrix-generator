@@ -1,5 +1,11 @@
 # Integration Matrix Generator
 
+![Python](https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white)
+![openpyxl](https://img.shields.io/badge/openpyxl-3.1.x-2E7D32)
+![Excel](https://img.shields.io/badge/output-XLSX-217346?logo=microsoftexcel&logoColor=white)
+![CLI](https://img.shields.io/badge/interface-CLI-4B5563)
+![Tests](https://img.shields.io/badge/tests-unittest-6B7280)
+
 Generate an Excel integration matrix from a CSV or JSON list of components.
 
 The workbook contains:
