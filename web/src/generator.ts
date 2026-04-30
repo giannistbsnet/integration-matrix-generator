@@ -71,27 +71,43 @@ export async function generateWorkbook(components: Component[]): Promise<ArrayBu
 
 // ─── Descriptions sheet ───────────────────────────────────────────────────────
 
+// TableStyleMedium2 colours replicated without addTable (which generates bad XML)
+const DESC_HEADER_FILL = 'FF4472C4';   // blue header
+const DESC_STRIPE_FILL = 'FFD9E1F2';  // light blue even-row stripe
+
 function buildDescriptionsSheet(sheet: ExcelJS.Worksheet, components: Component[]): void {
-  sheet.addTable({
-    name: 'Descriptions',
-    ref: 'A1',
-    headerRow: true,
-    totalsRow: false,
-    style: {
-      theme: 'TableStyleMedium2',
-      showFirstColumn: false,
-      showLastColumn: false,
-      showRowStripes: true,
-      showColumnStripes: false,
-    },
-    columns: [
-      { name: 'Partner', filterButton: true },
-      { name: 'Task', filterButton: true },
-      { name: 'Component', filterButton: true },
-      { name: 'Description of Component', filterButton: true },
-      { name: 'Description of Interface', filterButton: true },
-    ],
-    rows: components.map(c => [c.partner, c.task, c.component, '', '']),
+  const headers = ['Partner', 'Task', 'Component', 'Description of Component', 'Description of Interface'];
+
+  // Header row
+  const headerRow = sheet.getRow(1);
+  headerRow.height = 22.5;
+  headers.forEach((label, i) => {
+    const cell = headerRow.getCell(i + 1);
+    cell.value = label;
+    cell.fill = solidFill(DESC_HEADER_FILL);
+    cell.font = { name: 'Arial', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+    cell.alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
+    cell.border = {
+      bottom: thinBorder(THIN_BLACK_COLOR),
+      right: thinBorder(THIN_BLACK_COLOR),
+    };
+  });
+
+  // Data rows
+  const bodyFont: Partial<ExcelJS.Font> = { name: 'Arial', size: 10, color: { argb: TEXT_DARK } };
+  components.forEach((c, i) => {
+    const row = sheet.getRow(i + 2);
+    row.height = 45;
+    const values = [c.partner, c.task, c.component, '', ''];
+    values.forEach((val, j) => {
+      const cell = row.getCell(j + 1);
+      cell.value = val;
+      cell.font = bodyFont;
+      cell.alignment = { vertical: 'middle', wrapText: j >= 3 };
+      // Alternating row stripes (even data rows = i is odd → 0-indexed)
+      if (i % 2 === 1) cell.fill = solidFill(DESC_STRIPE_FILL);
+      cell.border = { right: thinBorder(THIN_BLACK_COLOR) };
+    });
   });
 
   sheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 1 }];
@@ -101,31 +117,6 @@ function buildDescriptionsSheet(sheet: ExcelJS.Worksheet, components: Component[
   sheet.getColumn('C').width = 35.13;
   sheet.getColumn('D').width = 37.13;
   sheet.getColumn('E').width = 25.88;
-  sheet.getRow(1).height = 22.5;
-
-  const headerFont: Partial<ExcelJS.Font> = { name: 'Arial', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
-  const bodyFont: Partial<ExcelJS.Font> = { name: 'Arial', size: 10, color: { argb: TEXT_DARK } };
-
-  for (let col = 1; col <= 5; col++) {
-    const cell = sheet.getCell(1, col);
-    cell.font = headerFont;
-    cell.alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
-  }
-
-  for (let i = 0; i < components.length; i++) {
-    const row = sheet.getRow(i + 2);
-    row.height = 45;
-    for (let col = 1; col <= 5; col++) {
-      const cell = row.getCell(col);
-      cell.font = bodyFont;
-      cell.alignment = { vertical: 'middle', wrapText: col >= 4 };
-    }
-  }
-
-  sheet.getCell('E1').note =
-    '1. What protocol/technology do you expose?\n\n' +
-    '2. What data do you send/receive and in what format?\n\n' +
-    '3. What does a consumer need to connect to you?';
 }
 
 // ─── Matrix sheet ─────────────────────────────────────────────────────────────
