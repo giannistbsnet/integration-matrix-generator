@@ -13,6 +13,12 @@ The workbook contains:
 - `Descriptions`: one row per component, with blank placeholder columns for component and interface descriptions.
 - `Integration Matrix`: one row and one two-column header group per component, with dropdowns for integration direction and interface type.
 
+## Preview
+
+![Generated integration matrix workbook](screenshots/integration-matrix-screenshot.png)
+
+Users fill in only the lower-left half of the matrix. The upper-right half is automatically completed from the matching counterpart cell: directions are flipped where needed (`↗` becomes `↙`, and `↙` becomes `↗`), bidirectional flows stay as `↔`, interfaces are copied, and empty counterpart cells remain blank.
+
 ## Install
 
 For quick use:
