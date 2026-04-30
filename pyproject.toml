@@ -8,10 +8,11 @@ version = "0.1.0"
 description = "Generate integration matrix Excel workbooks from component lists."
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = ["openpyxl>=3.1"]
+dependencies = ["openpyxl>=3.1,<4"]
 
 [project.scripts]
 integration-matrix = "integration_matrix.cli:main"
+generate-integration-matrix = "integration_matrix.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

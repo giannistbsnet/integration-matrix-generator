@@ -1,5 +1,7 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.venv/
+*.egg-info/
 IntegrationMatrix.generated.xlsx
 ~$*.xlsx
