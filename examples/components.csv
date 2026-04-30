@@ -1,5 +1,15 @@
 partner,task,component
 ACME,T1.1,Order Service
 ACME,T1.2,Inventory Service
+ACME,T1.3,Shipment Processor
+ACME,T1.4,Billing Gateway
 NOVA,T2.1,Analytics Engine
 NOVA,T2.2,Customer Portal
+NOVA,T2.3,Data Warehouse
+NOVA,T2.4,Notification Service
+ZEUS,T3.1,Workflow Orchestrator
+ZEUS,T3.2,Mobile App
+ZEUS,T3.3,Legacy ERP Connector
+NIMBUS,T4.1,API Gateway
+NIMBUS,T4.2,Partner Portal
+NIMBUS,T4.3,User Directory
