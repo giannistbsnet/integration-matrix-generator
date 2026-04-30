@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "integration-matrix-generator"
+version = "0.1.0"
+description = "Generate integration matrix Excel workbooks from component lists."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["openpyxl>=3.1"]
+
+[project.scripts]
+integration-matrix = "integration_matrix.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
