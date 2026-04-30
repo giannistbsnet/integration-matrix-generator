@@ -1,0 +1,22 @@
+[
+  {
+    "partner": "FLM",
+    "task": "T4.1",
+    "component": "UniMaaS EDC Connector"
+  },
+  {
+    "partner": "FLM",
+    "task": "T4.1",
+    "component": "Digital Thread Component"
+  },
+  {
+    "partner": "FLM",
+    "task": "T4.1",
+    "component": "Knowledge Graph"
+  },
+  {
+    "partner": "NTUA",
+    "task": "T4.2",
+    "component": "Resource Monitoring Engine"
+  }
+]
