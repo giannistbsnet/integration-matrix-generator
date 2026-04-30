@@ -9,7 +9,7 @@ The workbook contains:
 
 ## Install
 
-Recommended for day-to-day use:
+For quick use:
 
 ```bash
 ./scripts/generate-workbook --input examples/components.csv --output IntegrationMatrix.generated.xlsx
@@ -24,7 +24,7 @@ python3 -m pip install -e .
 generate-integration-matrix --input examples/components.csv --output IntegrationMatrix.generated.xlsx
 ```
 
-The legacy command also works after installation:
+This command is also available after installation:
 
 ```bash
 integration-matrix generate --input examples/components.csv --output IntegrationMatrix.generated.xlsx
