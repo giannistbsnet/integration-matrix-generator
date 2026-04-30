@@ -8,7 +8,7 @@
 ![Vite](https://img.shields.io/badge/bundler-Vite-646CFF?logo=vite&logoColor=white)
 ![Tests](https://img.shields.io/badge/tests-unittest-6B7280)
 
-Generate an Excel integration matrix from a CSV or JSON list of components — via the **browser-based web app** or the **Python CLI**.
+Generate an Excel integration matrix from a CSV or JSON list of components through the **browser-based web app** or the **Python CLI**.
 
 The workbook contains:
 
