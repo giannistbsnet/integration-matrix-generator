@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Integration Matrix Generator</title>
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>Integration Matrix Generator</h1>
+      <p>Generate an Excel integration matrix from a CSV or JSON component list</p>
+    </header>
+
+    <main class="main">
+      <div class="panel input-panel">
+        <div class="panel-header">
+          <h2>Components</h2>
+          <div class="panel-actions">
+            <div class="example-toggle">
+              <button id="show-csv" class="btn-outline btn-active btn-sm">CSV</button>
+              <button id="show-json" class="btn-outline btn-sm">JSON</button>
+            </div>
+            <button id="load-example" class="btn-outline btn-sm">Load example</button>
+            <label for="file-input" class="btn-outline btn-sm">Upload file</label>
+            <input type="file" id="file-input" accept=".csv,.json" />
+          </div>
+        </div>
+
+        <textarea
+          id="input"
+          spellcheck="false"
+          placeholder="partner,task,component&#10;ACME,T1.1,Order Service"
+        ></textarea>
+
+        <div id="message" class="message hidden"></div>
+
+        <button id="generate" class="btn-primary">Generate XLSX</button>
+      </div>
+
+      <aside class="panel help-panel">
+        <h2>Format</h2>
+
+        <h3>CSV</h3>
+        <pre>partner,task,component
+ACME,T1.1,Order Service
+NOVA,T2.1,Analytics Engine</pre>
+
+        <h3>JSON</h3>
+        <pre>[
+  {
+    "partner": "ACME",
+    "task": "T1.1",
+    "component": "Order Service"
+  }
+]</pre>
+
+        <p style="margin-top:10px">
+          <code>component</code> is required.<br/>
+          <code>partner</code> and <code>task</code> are optional.
+        </p>
+
+        <div class="help-divider"></div>
+
+        <h3>Matrix behavior</h3>
+        <p>Fill the lower triangle. The upper triangle mirrors automatically:</p>
+        <ul>
+          <li>↗ mirrors as ↙</li>
+          <li>↙ mirrors as ↗</li>
+          <li>↔ mirrors unchanged</li>
+          <li>Interface copies counterpart</li>
+        </ul>
+
+        <div class="help-divider"></div>
+
+        <h3>Direction options</h3>
+        <p>↔ &nbsp; ↗ &nbsp; ↙</p>
+
+        <h3>Interface options</h3>
+        <ul>
+          <li>REST API</li>
+          <li>GraphQL, gRPC</li>
+          <li>Kafka, MQTT</li>
+          <li>WebSocket</li>
+          <li>SPARQL endpoint</li>
+          <li>NGSI-LD</li>
+          <li>Eclipse Dataspace Connector (EDC)</li>
+          <li>AAS / Eclipse BaSyx</li>
+          <li>File / Batch</li>
+          <li>Other</li>
+        </ul>
+      </aside>
+    </main>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

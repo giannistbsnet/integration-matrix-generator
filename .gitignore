@@ -5,3 +5,7 @@ __pycache__/
 *.egg-info/
 IntegrationMatrix.generated.xlsx
 ~$*.xlsx
+
+# Frontend
+web/node_modules/
+web/dist/

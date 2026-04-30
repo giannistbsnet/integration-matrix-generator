@@ -4,9 +4,11 @@
 ![openpyxl](https://img.shields.io/badge/openpyxl-3.1.x-2E7D32)
 ![Excel](https://img.shields.io/badge/output-XLSX-217346?logo=microsoftexcel&logoColor=white)
 ![CLI](https://img.shields.io/badge/interface-CLI-4B5563)
+![TypeScript](https://img.shields.io/badge/frontend-TypeScript-3178C6?logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/bundler-Vite-646CFF?logo=vite&logoColor=white)
 ![Tests](https://img.shields.io/badge/tests-unittest-6B7280)
 
-Generate an Excel integration matrix from a CSV or JSON list of components.
+Generate an Excel integration matrix from a CSV or JSON list of components — via the **browser-based web app** or the **Python CLI**.
 
 The workbook contains:
 
@@ -19,7 +21,40 @@ The workbook contains:
 
 Users fill in only the lower-left half of the matrix. The upper-right half is automatically completed from the matching counterpart cell: directions are flipped where needed (`↗` becomes `↙`, and `↙` becomes `↗`), bidirectional flows stay as `↔`, interfaces are copied, and empty counterpart cells remain blank.
 
-## Install
+---
+
+## Web App (GitHub Pages)
+
+The frontend is a static Vite + TypeScript app that generates the XLSX entirely in the browser using [ExcelJS](https://github.com/exceljs/exceljs). No backend required.
+
+### Local development
+
+```bash
+cd web
+npm install
+npm run dev
+```
+
+### Build
+
+```bash
+cd web
+npm run build
+# Output: web/dist/
+```
+
+### GitHub Pages deployment
+
+Push to `main` — the included GitHub Actions workflow (`.github/workflows/deploy.yml`) builds the app and deploys `web/dist/` to GitHub Pages automatically.
+
+Before the first deploy, enable GitHub Pages in your repo settings:
+**Settings → Pages → Source → GitHub Actions**.
+
+---
+
+## Python CLI
+
+### Install
 
 For quick use:
 
@@ -27,7 +62,7 @@ For quick use:
 ./scripts/generate-workbook --input examples/components.csv --output IntegrationMatrix.generated.xlsx
 ```
 
-The script creates a local `.venv` in this project and installs pinned dependencies there. That keeps the tool isolated from your global Python packages and avoids PATH issues with user-level pip installs.
+The script creates a local `.venv` in this project and installs pinned dependencies there.
 
 If you prefer a normal editable Python install:
 
@@ -47,6 +82,8 @@ You can also run the package without installing the console script if dependenci
 ```bash
 PYTHONPATH=src python3 -m integration_matrix generate --input examples/components.csv --output IntegrationMatrix.generated.xlsx
 ```
+
+---
 
 ## Input Format
 
@@ -93,6 +130,14 @@ Eclipse Dataspace Connector (EDC), AAS / Eclipse BaSyx, File / Batch, Other
 
 ## Tests
 
+Python:
+
 ```bash
 PYTHONPATH=src python3 -m unittest discover -s tests
+```
+
+Frontend build (also runs TypeScript type-check):
+
+```bash
+cd web && npm run build
 ```
