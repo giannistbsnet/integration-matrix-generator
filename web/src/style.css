@@ -2,10 +2,10 @@
   --bg: #F9F9F7;
   --surface: #FFFFFF;
   --border: #E3DDD6;
-  --border-focus: #CC7D5E;
-  --primary: #CC7D5E;
-  --primary-hover: #B56A4A;
-  --primary-active: #9E5838;
+  --border-focus: #5C7A52;
+  --primary: #5C7A52;
+  --primary-hover: #4B6742;
+  --primary-active: #3A5433;
   --text: #2D2D2B;
   --text-muted: #7A736A;
   --text-code: #4A3F35;
@@ -348,7 +348,7 @@ kbd {
   background: var(--primary-hover);
   border-color: var(--primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(204,125,94,0.28);
+  box-shadow: 0 4px 10px rgba(92,122,82,0.28);
 }
 
 .btn-generate:active {
@@ -497,8 +497,8 @@ kbd {
 .schema-note {
   margin-top: 14px;
   padding: 9px 11px;
-  background: #FDF8F4;
-  border: 1px solid #EDD9C8;
+  background: #F3F7F0;
+  border: 1px solid #C6D9BC;
   border-radius: var(--radius);
   font-size: 12px;
   color: var(--text-muted);
